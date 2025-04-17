@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { FormError } from "../form-error";
+import { Formsuccess } from "../form-success";
 
 export const LoginForm = () => {
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -24,7 +26,12 @@ export const LoginForm = () => {
             email: "",
             password: "",
         },
-    })
+    });
+
+    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+        console.log(values);
+    }
+
 
     return (
         <CardWrapper
@@ -35,7 +42,7 @@ export const LoginForm = () => {
         >
             <Form {...form}>
                 <form 
-                    onSubmit={form.handleSubmit(() => {})}
+                    onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                     >
                         <div className="space-y-4">
@@ -74,6 +81,8 @@ export const LoginForm = () => {
                                 )}
                             />
                         </div>
+                        <FormError message=""/>
+                        <Formsuccess message=""/>
                         <Button
                             type="submit"
                             className="w-full"
