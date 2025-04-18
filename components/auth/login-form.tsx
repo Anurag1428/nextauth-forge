@@ -1,7 +1,7 @@
 "use client";
 
 import * as z from "zod"
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import { CardWrapper } from "./card-wrapper"
@@ -19,8 +19,11 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { FormError } from "../form-error";
 import { Formsuccess } from "../form-success";
+import { login } from "@/actions/login";
 
 export const LoginForm = () => {
+    const [error, setError] = useState<string | undefined>("");
+    const [success, setSuccess] = useState<string | undefined>("");
     const [isPending, startTransition] = useTransition();
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -32,8 +35,15 @@ export const LoginForm = () => {
     });
 
     const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+        setError("");
+        setSuccess("");
+
         startTransition(() => {
-            console.log(values);
+            login(values)
+            .then((data) => {
+                setError(data.error);
+                setSuccess(data.success);
+            })
         })
     }
 
@@ -88,8 +98,8 @@ export const LoginForm = () => {
                                 )}
                             />
                         </div>
-                        <FormError message=""/>
-                        <Formsuccess message=""/>
+                        <FormError message={error}/>
+                        <Formsuccess message={success}/>
                         <Button
                             disabled={isPending}
                             type="submit"
