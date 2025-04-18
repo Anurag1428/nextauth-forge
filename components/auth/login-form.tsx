@@ -1,6 +1,7 @@
 "use client";
 
 import * as z from "zod"
+import { useTransition } from "react";
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import { CardWrapper } from "./card-wrapper"
@@ -20,6 +21,8 @@ import { FormError } from "../form-error";
 import { Formsuccess } from "../form-success";
 
 export const LoginForm = () => {
+    const [isPending, startTransition] = useTransition();
+
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
         defaultValues: {
@@ -29,7 +32,9 @@ export const LoginForm = () => {
     });
 
     const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-        console.log(values);
+        startTransition(() => {
+            console.log(values);
+        })
     }
 
 
@@ -56,6 +61,7 @@ export const LoginForm = () => {
                                             <Input
                                                 type="email"
                                                 placeholder="Enter your email"
+                                                disabled={isPending}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -73,6 +79,7 @@ export const LoginForm = () => {
                                             <Input
                                                 type="password"
                                                 placeholder="******"
+                                                disabled={isPending}
                                                 {...field}
                                             />
                                         </FormControl>
@@ -84,6 +91,7 @@ export const LoginForm = () => {
                         <FormError message=""/>
                         <Formsuccess message=""/>
                         <Button
+                            disabled={isPending}
                             type="submit"
                             className="w-full"
                         >
