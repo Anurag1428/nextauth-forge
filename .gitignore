@@ -37,3 +37,6 @@ prisma/migrations/
 # Next.js
 .next/cache/
 .next/static/
+
+#changed location of prisma generated output files
+lib/generated/prisma/
