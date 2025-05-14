@@ -1,29 +1,19 @@
-import bcrypt from "bcryptjs"
+import Credentials from "next-auth/providers/credentials"
 import type { NextAuthConfig } from "next-auth"
-import Credentials from "next-auth/providers/credentials";
 
-import { LoginSchema } from "./schemas";
-import { getUserByEmail } from "./data/user";
-
-export default { providers: [Credentials({ 
-    async authorize(credentials) {
-        const validatedFields = LoginSchema.safeParse(credentials);
-
-        if (validatedFields.success) {
-            const { email, password } = validatedFields.data;
-
-            const user = await getUserByEmail(email);
-            if(!user || !user.password) return null;
-            
-            const passwordMatch = await bcrypt.compare(
-                password,
-                user.password,
-            );
-            
-            if(passwordMatch) return user;
-        }
-
-        return null;
-    }
- })] 
+export default {
+  providers: [
+    Credentials({
+      // Provide a placeholder function for Edge use (middleware)
+      authorize() {
+        return null // No DB access in Edge
+      },
+    }),
+  ],
+  pages: {
+    signIn: "/auth/login",
+  },
+  session: {
+    strategy: "jwt", // required for Edge compatibility
+  },
 } satisfies NextAuthConfig
