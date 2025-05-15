@@ -18,5 +18,6 @@ const SettingsPage = async () => {
         </div>
      );
 }
+// Understanding some logic of callback and in nextAuth v5
  
 export default SettingsPage;
