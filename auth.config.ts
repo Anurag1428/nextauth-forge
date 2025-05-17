@@ -36,5 +36,6 @@ const authConfig: NextAuthConfig = {
     signIn: "/auth/login",
   },
 }
+// Studying more bout callbacks
 
 export default authConfig
