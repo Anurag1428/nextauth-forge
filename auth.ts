@@ -1,79 +1,35 @@
-// import NextAuth from "next-auth"
-// import { PrismaAdapter } from "@auth/prisma-adapter"
-// import { PrismaClient } from "@prisma/client"
-// import Credentials from "next-auth/providers/credentials"
-// import bcrypt from "bcryptjs"
-// import { getUserByEmail } from "./data/user"
-// import authConfig from "./auth.config"
-
-// const prisma = new PrismaClient()
-
-// export const { auth, handlers, signIn, signOut } = NextAuth({
-//   ...authConfig, // bring in session/pages/etc.
-//   adapter: PrismaAdapter(prisma),
-//   providers: [
-//     Credentials({
-//       async authorize(credentials) {
-//         const { email, password } = credentials ?? {}
-//         if (!email || !password) return null
-
-//         const user = await getUserByEmail(email)
-//         if (!user || !user.password) return null
-
-//         const isValid = await bcrypt.compare(password, user.password)
-//         if (!isValid) return null
-
-//         return user
-//       },
-//     }),
-//   ],
-// })
-
-
 import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcryptjs"
+import { getUserById } from "@/data/user"
+import { db } from "@/lib/db"
+import authConfig from "@/auth.config"
 
-import authConfig from "./auth.config"
-import { getUserByEmail } from "./data/user"
-
-const prisma = new PrismaClient()
-
-export const { auth, handlers, signIn, signOut } = NextAuth({
-  ...authConfig,
+export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   callbacks: {
-    async session({ session, token, user }) {
-      
+    async session({ token, session }) {
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
+
+      if (token.role && session.user) {
+        session.user.role = token.role;
+      }
+
       return session;
     },
     async jwt({ token }) {
+      if (!token.sub) return token;
+
+      const existingUser = await getUserById(token.sub);
+
+      if (!existingUser) return token;
+
+      token.role = existingUser.role;
+
       return token;
     }
   },
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    Credentials({
-      async authorize(credentials) {
-        const { email, password } = credentials ?? {}
-        if (!email || !password) return null
-
-        const user = await getUserByEmail(email)
-        if (!user || !user.password) return null
-
-        const isValid = await bcrypt.compare(password, user.password)
-        if (!isValid) return null
-
-        return user
-      },
-    }),
-  ],
-  // (optional) You can override or expand the session config here
-  session: {
-    strategy: "jwt", // Safe default
-  },
+  adapter: PrismaAdapter(db),
+  session: { strategy: "jwt" },
+  ...authConfig,
 })

@@ -1,14 +1,5 @@
 import { db } from "@/lib/db";
 
-// export const getUserByEmail = async (email: string) => {
-//     try {
-//         const user = await db.user.findUnique({ where: { email } });
-        
-//     } catch {
-//         return null;
-//     }
-// }
-
 export const getUserByEmail = async (email: string) => {
     try {
         const user = await db.user.findUnique({
@@ -17,22 +8,33 @@ export const getUserByEmail = async (email: string) => {
                 id: true,
                 email: true,
                 name: true,
-                password: true, // Ensure you're selecting password
+                password: true,
+                role: true, // Add this line - this was missing!
             },
         });
-        return user;  // Add this return statement
+        console.log("getUserByEmail result:", user); // Debug log
+        return user;
     } catch (error) {
         console.error("Error fetching user:", error);
         return null;
     }
 }
 
-
 export const getUserById = async (id: string) => {
     try {
-        const user = await db.user.findUnique({ where: { id } });
-        
-    } catch {
+        const user = await db.user.findUnique({ 
+            where: { id },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true, // Make sure role is selected
+            }
+        });
+        console.log("getUserById result:", user); // Debug log
+        return user; // This return statement was completely missing!
+    } catch (error) {
+        console.error("Error fetching user by ID:", error);
         return null;
     }
 }
