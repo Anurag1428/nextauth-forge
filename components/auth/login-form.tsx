@@ -34,18 +34,28 @@ export const LoginForm = () => {
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
-        setError("");
-        setSuccess("");
+   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    setError("");
+    setSuccess("");
 
-        startTransition(() => {
-            login(values)
-            .then((data) => {
+    startTransition(() => {
+        login(values)
+        .then((data) => {
+            // Add null check to prevent the error
+            if (data) {
                 setError(data.error);
                 setSuccess(data.success);
-            })
+            } else {
+                setError("An unexpected error occurred");
+            }
         })
-    }
+        .catch((error) => {
+            // Handle any promise rejections
+            setError("An error occurred during login");
+            console.error("Login error:", error);
+        })
+    })
+}
 
 
     return (
