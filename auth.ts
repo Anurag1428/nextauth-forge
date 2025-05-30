@@ -7,7 +7,18 @@ import authConfig from "@/auth.config"
 
 // export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
 export const { handlers, auth, signIn, signOut } = NextAuth({
-
+  pages: {
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
+  events: {
+    async linkAccount({ user }) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() }
+      })
+    }
+  },
   callbacks: {
     async session({ token, session }) {
       if (token.sub && session.user) {
