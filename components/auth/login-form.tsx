@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import {useForm} from "react-hook-form"
 import {zodResolver} from "@hookform/resolvers/zod"
 import { CardWrapper } from "./card-wrapper"
+import { useSearchParams } from "next/navigation";
 
 import { LoginSchema } from "@/schemas"
 import {
@@ -22,6 +23,12 @@ import { Formsuccess } from "../form-success";
 import { login } from "@/actions/login";
 
 export const LoginForm = () => {
+    const searachParams = useSearchParams();
+    const urlError = searachParams.get("error") === "OAuthAccountNotLinked"
+        ? "Email already in use with another provider!"
+        : "";
+
+
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
     const [isPending, startTransition] = useTransition();
@@ -43,8 +50,9 @@ export const LoginForm = () => {
         .then((data) => {
             // Add null check to prevent the error
             if (data) {
-                setError(data.error);
-                setSuccess(data.success);
+                setError(data?.error);
+                // TODO: Add when we add 2FA
+                // setSuccess(data?.success);
             } else {
                 setError("An unexpected error occurred");
             }
@@ -108,7 +116,7 @@ export const LoginForm = () => {
                                 )}
                             />
                         </div>
-                        <FormError message={error}/>
+                        <FormError message={error || urlError}/>
                         <Formsuccess message={success}/>
                         <Button
                             disabled={isPending}
