@@ -1,5 +1,6 @@
 "use client";
 
+import { BeatLoader } from "react-spinners"
 import { CardWrapper } from "./card-wrapper";
 
 export const NewVerificationForm = () => {
@@ -10,7 +11,7 @@ export const NewVerificationForm = () => {
             backButtonHref="/auth/login"
         >
             <div className="flex items-center w-full justify-center">
-
+                <BeatLoader />
             </div>
         </CardWrapper>
     )
